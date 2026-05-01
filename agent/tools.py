@@ -10,16 +10,29 @@ TOOLS: list[dict] = [
         "function": {
             "name": "get_files_info",
             "description": (
-                "List files and subdirectories in a directory inside the sandbox. "
-                "Returns name, size, and type for each entry."
+                "Show a tree listing of the sandbox directory. "
+                "Always call this first to discover file paths before reading or writing. "
+                "The output shows exact relative paths you should use with other tools."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "directory": {
                         "type": "string",
-                        "description": "Relative path to the directory. Defaults to '.' (sandbox root).",
-                    }
+                        "description": (
+                            "Relative path to the directory to list. "
+                            "Use '.' for the workspace root. "
+                            "Use 'pkg' to list inside the pkg/ subdirectory."
+                        ),
+                    },
+                    "depth": {
+                        "type": "integer",
+                        "description": (
+                            "How many directory levels to show (1–5). "
+                            "Default 2 shows the root and one level of subdirectories. "
+                            "Use 3 or more for deeply nested projects."
+                        ),
+                    },
                 },
                 "required": [],
             },
