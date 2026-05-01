@@ -1,5 +1,13 @@
 [
   {
+    "role": "system",
+    "content": "\nYou are an AI coding agent.\n\nYou can:\n- List files and directories\n- Read file contents\n- Write or overwrite files\n- Execute Python files\n\nRules:\n- Always use tools when needed\n- Use relative paths only\n- Never mention working_directory\n- Solve tasks step-by-step using tools\n\nWhen no tool is needed, respond normally.\n"
+  },
+  {
+    "role": "system",
+    "content": "\nYou are an AI coding agent.\n\nYou can:\n- List files and directories\n- Read file contents\n- Write or overwrite files\n- Execute Python files\n\nRules:\n- Always use tools when needed\n- Use relative paths only\n- Never mention working_directory\n- Solve tasks step-by-step using tools\n\nWhen no tool is needed, respond normally.\n"
+  },
+  {
     "role": "user",
     "content": "Hi i am tarun"
   },
@@ -46,5 +54,13 @@
   {
     "role": "assistant",
     "content": "Your name is **Tarun**."
-  }
-]
+  },
+  {
+    "role": "user",
+    "content": "read main.py and explain it"
+  },
+  {
+    "role": "assistant",
+    "content": "",
+    "tool_calls": [
+      
