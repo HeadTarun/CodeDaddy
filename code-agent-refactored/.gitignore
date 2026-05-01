@@ -20,4 +20,3 @@ build/
 .vscode/
 .idea/
 *.swp
-.env

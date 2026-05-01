@@ -1,33 +1,66 @@
+"""
+functions/write_file.py — Write a file inside the sandbox.
+"""
+
 import os
+from agent.config import MAX_FILE_WRITE_BYTES
 
 
-def write_file(working_directory, file_path, content):
+def write_file(working_directory: str, file_path: str, content: str) -> str:
+    """
+    Write `content` to `file_path` (relative to `working_directory`).
+
+    Safety:
+    - Path traversal prevention (commonpath check)
+    - Refuses to write to directories
+    - Enforces a maximum content size (MAX_FILE_WRITE_BYTES)
+    - Creates parent directories as needed
+    """
     try:
-        # Step 1: absolute working directory
         working_dir_abs = os.path.abspath(working_directory)
+        target_path = os.path.normpath(os.path.join(working_dir_abs, file_path))
 
-        # Step 2: construct safe target path
-        target_path = os.path.normpath(
-            os.path.join(working_dir_abs, file_path)
-        )
+        # ── Path traversal guard ──────────────────────────────────────────────
+        if not _is_safe_path(working_dir_abs, target_path):
+            return (
+                f'Error: Cannot write to "{file_path}" — path is outside the '
+                f"permitted working directory."
+            )
 
-        # Step 3: security check (prevent path traversal)
-        if os.path.commonpath([working_dir_abs, target_path]) != working_dir_abs:
-            return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
-
-        # Step 4: prevent writing to a directory
+        # ── Refuse to overwrite a directory ───────────────────────────────────
         if os.path.isdir(target_path):
-            return f'Error: Cannot write to "{file_path}" as it is a directory'
+            return f'Error: "{file_path}" is a directory, not a file.'
 
-        # Step 5: ensure parent directories exist
-        parent_dir = os.path.dirname(target_path)
-        os.makedirs(parent_dir, exist_ok=True)
+        # ── Content size guard ────────────────────────────────────────────────
+        encoded = content.encode("utf-8")
+        if len(encoded) > MAX_FILE_WRITE_BYTES:
+            return (
+                f"Error: Content too large ({len(encoded)} bytes). "
+                f"Maximum allowed: {MAX_FILE_WRITE_BYTES} bytes."
+            )
 
-        # Step 6: write content
+        # ── Create parent directories ─────────────────────────────────────────
+        parent = os.path.dirname(target_path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+
+        # ── Write ─────────────────────────────────────────────────────────────
         with open(target_path, "w", encoding="utf-8") as f:
             f.write(content)
 
-        return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
+        return (
+            f'Successfully wrote to "{file_path}" '
+            f"({len(encoded)} bytes, {len(content)} chars)."
+        )
 
+    except OSError as e:
+        return f"Error writing file: {e}"
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error: {e}"
+
+
+def _is_safe_path(base: str, target: str) -> bool:
+    try:
+        return os.path.commonpath([base, target]) == base
+    except ValueError:
+        return False
