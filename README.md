@@ -1,4 +1,4 @@
-# 🤖 Code Agent
+# 🤖 CodeDaddy ; Dadddy is Home
 
 A local AI coding agent powered by [Groq](https://groq.com) that can read, write, and execute code inside a sandboxed workspace.
 
